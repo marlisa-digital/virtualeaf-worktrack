@@ -1436,8 +1436,8 @@ async function openProjectModal(id) {
   // Populate members dropdown — reload fresh dari DB
   var memberSel = document.getElementById("pr-members");
   memberSel.innerHTML = "<option value=''>Loading...</option>";
-  var { data: freshMembers } = await sb.from("vl_users").select("*").eq("team_id", currentTeamId).eq("is_active", true).neq("role", "admin");
-  var members = freshMembers || teamMembers.filter(function(m){ return m.role === "member" && m.is_active; });
+  var { data: freshMembers } = await sb.from("vl_users").select("*").eq("team_id", currentTeamId).eq("is_active", true);
+  var members = freshMembers || teamMembers.filter(function(m){ return m.is_active; });
   memberSel.innerHTML = members.length
     ? members.map(function(m){ return "<option value='"+m.id+"'>"+esc(m.display_name||m.username)+"</option>"; }).join("")
     : "<option value=''>Belum ada member</option>";
