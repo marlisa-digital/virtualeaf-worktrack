@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -491,12 +492,6 @@ textarea{resize:vertical;min-height:64px}
           <option value="admin">Admin</option>
         </select>
       </div>
-    </div>
-    <div class="form-group full">
-      <label>Assign ke Proyek (opsional)</label>
-      <select id="gen-project" multiple style="min-height:80px">
-      </select>
-      <span style="font-size:10px;color:var(--muted);margin-top:3px">Ctrl+klik untuk pilih beberapa proyek</span>
     </div>
     <div id="gen-result" style="display:none;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:8px;font-family:var(--mono);font-size:11px"></div>
     <div class="modal-actions">
@@ -1678,9 +1673,6 @@ async function generateUser() {
   var displayName = document.getElementById("gen-displayname").value.trim();
   var password = document.getElementById("gen-password").value.trim() || generatePassword(10);
   var role = document.getElementById("gen-role").value;
-  var selEl = document.getElementById("gen-project");
-  var assignedProjects = Array.from(selEl.selectedOptions).map(function(o){ return o.value; });
-
   if (!username) { toast("Username wajib diisi."); return; }
   if (!displayName) { toast("Nama lengkap wajib diisi."); return; }
   if (password.length < 6) { toast("Password minimal 6 karakter."); return; }
@@ -1701,18 +1693,6 @@ async function generateUser() {
 
   if (error) { toast("Error: " + error.message); return; }
 
-  if (assignedProjects.length && newUser) {
-    var insertions = assignedProjects.map(function(pid){
-      return { user_id: newUser.id, project_id: pid };
-    });
-    await sb.from("vl_user_projects").insert(insertions);
-  }
-
-  var projNames = assignedProjects.map(function(pid){
-    var p = projects.find(function(x){ return x.id === pid; });
-    return p ? p.name : pid;
-  }).join(", ") || "Semua proyek";
-
   var resultEl = document.getElementById("gen-result");
   resultEl.style.display = "block";
   resultEl.innerHTML =
@@ -1720,7 +1700,6 @@ async function generateUser() {
     "<div style='margin-bottom:4px'>Username : <b>" + username + "</b></div>" +
     "<div style='margin-bottom:4px'>Password : <b>" + password + "</b></div>" +
     "<div style='margin-bottom:4px'>Role     : <b>" + role + "</b></div>" +
-    "<div>Proyek   : <b>" + projNames + "</b></div>" +
     "<div style='margin-top:8px;color:var(--muted);font-size:10px'>⚠ Salin credentials ini sekarang — password tidak bisa dilihat lagi.</div>";
 
   var { data: members } = await sb.from("vl_users").select("*").eq("team_id", currentTeamId);
