@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1434,9 +1433,11 @@ async function openProjectModal(id) {
   var opts = "<option value=''>— Pilih Klien —</option>"+clients.map(function(c){return "<option value='"+c.id+"'"+(pr&&pr.client_id===c.id?" selected":"")+">"+esc(c.name)+"</option>";}).join("");
   document.getElementById("pr-client").innerHTML = opts;
   updateRateLabel();
-  // Populate members dropdown
-  var members = teamMembers.filter(function(m){ return m.role === "member" && m.is_active; });
+  // Populate members dropdown — reload fresh dari DB
   var memberSel = document.getElementById("pr-members");
+  memberSel.innerHTML = "<option value=''>Loading...</option>";
+  var { data: freshMembers } = await sb.from("vl_users").select("*").eq("team_id", currentTeamId).eq("is_active", true).neq("role", "admin");
+  var members = freshMembers || teamMembers.filter(function(m){ return m.role === "member" && m.is_active; });
   memberSel.innerHTML = members.length
     ? members.map(function(m){ return "<option value='"+m.id+"'>"+esc(m.display_name||m.username)+"</option>"; }).join("")
     : "<option value=''>Belum ada member</option>";
